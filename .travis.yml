@@ -1,0 +1,21 @@
+sudo: required
+services:
+- docker
+language: bash
+git:
+  depth: 1
+env:
+  global:
+    - LANG=de_DE.UTF-8
+script:
+- pwd
+- docker-compose version
+- echo "TRAVIS_BRANCH="$TRAVIS_BRANCH;
+# prepare qemu
+- docker run --rm --privileged multiarch/qemu-user-static:register --reset;
+# build image
+- cd $TRAVIS_BUILD_DIR/build
+- docker-compose build
+# push image
+- docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+- docker push $DOCKER_USER/alexa_c:stretch
