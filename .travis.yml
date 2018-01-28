@@ -13,9 +13,13 @@ script:
 - echo "TRAVIS_BRANCH="$TRAVIS_BRANCH;
 # prepare qemu
 - docker run --rm --privileged multiarch/qemu-user-static:register --reset;
-# build image
-- cd $TRAVIS_BUILD_DIR/build
+# build images
+- cd $TRAVIS_BUILD_DIR/base/build
 - docker-compose build
-# push image
+- cd $TRAVIS_BUILD_DIR/sdk/build
+- docker-compose build
+# push images
+- docker images
 - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
-- docker push $DOCKER_USER/alexa_c:stretch
+- docker push $DOCKER_USER/alexa_sdk_base:rpi
+- docker push $DOCKER_USER/alexa_sdk:rpi
