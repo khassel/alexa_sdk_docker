@@ -6,12 +6,7 @@ RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get -y install git gcc cmake build-essential libsqlite3-dev libcurl4-openssl-dev libfaad-dev \
  libsoup2.4-dev libgcrypt20-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-good libasound2-dev doxygen \
- libatlas-base-dev wget sox python-pip python
- 
-RUN pip install --upgrade setuptools
-RUN pip install flask commentjson requests
-
-RUN apt-get update && apt-get -y install alsa-utils nano
+ libatlas-base-dev wget sox nano
  
 RUN cd /usr/bin && ls -la | grep gcc
 
