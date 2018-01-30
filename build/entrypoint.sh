@@ -23,6 +23,6 @@ fi
 cd ./sdk-build/SampleApp/src \
   && TZ=UTC ./SampleApp \
   /srv/sdk-folder/sdk-build/Integration/AlexaClientSDKConfig.json \
-  /srv/sdk-folder/third-party/snowboy/resources/
+  /srv/sdk-folder/third-party/snowboy/resources/ $1
 
   
