@@ -6,6 +6,6 @@ services:
     build: 
       context: ./
       args:
-        myimage: "debian:stretch"
+        myimage: "ubuntu:16.04"
     container_name: alexa
-    image: karsten13/alexa_sdk:debian
+    image: karsten13/alexa_sdk:ubuntu64
