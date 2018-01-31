@@ -11,14 +11,14 @@ RUN apt-get -y install gcc-4.8 g++-4.8
 
 RUN apt-get -y install git cmake libsqlite3-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-good libasound2-dev \
 	nano libatlas-base-dev wget gstreamer1.0-plugins-ugly gstreamer1.0-plugins-bad gstreamer1.0-alsa alsa-utils make \
-	libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev gstreamer1.0-libav doxygen
+	libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-libav doxygen
 	
 RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
 	  apt-get install -y libcurl4-openssl-dev libfaad-dev libsoup2.4-dev libgcrypt20-dev sox python-pip python; \
     else \
 	  apt-get install -y openssl clang-format pulseaudio  repo binutils autoconf automake autotools-dev libtool pkg-config \
 		zlib1g-dev libcunit1-dev libssl-dev libxml2-dev libev-dev libevent-dev libjansson-dev libjemalloc-dev cython \
-		python3-dev python-setuptools; \
+		python3-dev python-setuptools libgstreamer-plugins-good1.0-dev; \
     fi
 	
 ENV BASE=/srv
@@ -58,12 +58,17 @@ RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
 RUN python --version && pip --version && cd /usr/bin && ls -la | grep gcc
 
 RUN cd /usr/bin \
- && rm gcc && rm gcc-ar && rm gcc-nm && rm gcc-ranlib && rm g++ \
+ && rm gcc && rm gcc-ar && rm gcc-nm && rm gcc-ranlib \
  && ln -s gcc-4.8 gcc \
  && ln -s gcc-ar-4.8 gcc-ar \
  && ln -s gcc-nm-4.8 gcc-nm \
- && ln -s gcc-ranlib-4.8 gcc-ranlib \
- && ln -s g++-4.8 g++
+ && ln -s gcc-ranlib-4.8 gcc-ranlib
+ 
+RUN cd /usr/bin; \
+    if [ -f g++ ]; then \
+      rm g++; \
+    fi; \
+	ln -s g++-4.8 g++
  
 RUN gcc --version && g++ --version
 
