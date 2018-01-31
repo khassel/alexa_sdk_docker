@@ -3,7 +3,7 @@ FROM $myimage
 MAINTAINER Karsten Hassel
 
 ARG myimage
-ENV myimage
+ENV myimage=$myimage
 
 RUN apt-get update && apt-get upgrade -y
 
