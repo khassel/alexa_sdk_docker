@@ -11,6 +11,11 @@ script:
 - pwd
 - docker-compose version
 - echo "TRAVIS_BRANCH="$TRAVIS_BRANCH;
+- >
+  if [ "$TRAVIS_BRANCH" !== "ubuntu64" ] && [ "$TRAVIS_BRANCH" !== "rpi" ] ; then
+    # exit
+    exit 0;
+  fi
 # prepare qemu
 - docker run --rm --privileged multiarch/qemu-user-static:register --reset;
 # build image
@@ -19,4 +24,4 @@ script:
 # push image
 - docker images
 - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
-- docker push $DOCKER_USER/alexa_sdk:rpi
+- docker push $DOCKER_USER/alexa_sdk:$TRAVIS_BRANCH
