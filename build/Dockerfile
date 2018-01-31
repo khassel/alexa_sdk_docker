@@ -2,7 +2,7 @@ ARG myimage
 FROM $myimage
 MAINTAINER Karsten Hassel
 
-RUN apt-get update
+RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get -y install gcc-4.8 g++-4.8
 
@@ -57,15 +57,13 @@ RUN g++ --version
 
 # Fix im Quelltext wegen compile error (todo: mit sed lösen):
 # https://github.com/alexa/avs-device-sdk/issues/385
-COPY KittAiKeyWordDetector.cpp $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src/KittAiKeyWordDetector.cpp
-
-#RUN ln -s /usr/lib/atlas-base/atlas/libblas.so.3 /usr/lib/libblas.so
+#COPY KittAiKeyWordDetector.cpp $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src/KittAiKeyWordDetector.cpp
 
 WORKDIR $BASE/sdk-folder/sdk-build
 
 RUN cmake $BASE/sdk-folder/sdk-source/avs-device-sdk \
  -DKITTAI_KEY_WORD_DETECTOR=ON \
- -DKITTAI_KEY_WORD_DETECTOR_LIB_PATH=$BASE/sdk-folder/third-party/snowboy/lib/rpi/libsnowboy-detect.a \
+ -DKITTAI_KEY_WORD_DETECTOR_LIB_PATH=$BASE/sdk-folder/third-party/snowboy/lib/ubuntu64/libsnowboy-detect.a \
  -DKITTAI_KEY_WORD_DETECTOR_INCLUDE_DIR=$BASE/sdk-folder/third-party/snowboy/include \
  -DGSTREAMER_MEDIA_PLAYER=ON \
  -DPORTAUDIO=ON \
@@ -76,7 +74,7 @@ RUN cmake $BASE/sdk-folder/sdk-source/avs-device-sdk \
  
 RUN make SampleApp -j2
  
-#RUN apt-get clean  
+RUN apt-get clean  
 
 RUN echo "========== Configuring ALSA Devices ==========" \
  && printf "pcm.!default {\n  type asym\n   playback.pcm {\n     type plug\n     slave.pcm \"hw:0,0\"\n   }\n   capture.pcm {\n     type plug\n     slave.pcm \"hw:1,0\"\n   }\n}" >> /root/.asoundrc
