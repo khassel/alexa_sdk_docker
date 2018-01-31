@@ -58,12 +58,17 @@ RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
 RUN python --version && pip --version && cd /usr/bin && ls -la | grep gcc
 
 RUN cd /usr/bin \
- && rm gcc && rm gcc-ar && rm gcc-nm && rm gcc-ranlib && rm g++ \
+ && rm gcc && rm gcc-ar && rm gcc-nm && rm gcc-ranlib \
  && ln -s gcc-4.8 gcc \
  && ln -s gcc-ar-4.8 gcc-ar \
  && ln -s gcc-nm-4.8 gcc-nm \
- && ln -s gcc-ranlib-4.8 gcc-ranlib \
- && ln -s g++-4.8 g++
+ && ln -s gcc-ranlib-4.8 gcc-ranlib
+ 
+RUN cd /usr/bin; \
+    if [ -f g++ ]; then \
+      rm g++; \
+    fi; \
+	ln -s g++-4.8 g++
  
 RUN gcc --version && g++ --version
 
