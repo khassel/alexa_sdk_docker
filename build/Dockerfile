@@ -12,19 +12,19 @@ RUN apt-get update && apt-get upgrade -y
 #../../KWD/KittAi/src/libKITTAI.so: undefined reference to `snowboy::SnowboyDetect::SetSensitivity(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
 #../../KWD/KittAi/src/libKITTAI.so: undefined reference to `snowboy::SnowboyDetect::SnowboyDetect(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
 
-RUN apt-get -y install gcc-4.8 g++-4.8
-
-RUN apt-get -y install git cmake libsqlite3-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-good libasound2-dev \
+RUN apt-get -y install gcc-4.8 g++-4.8; \
+    apt-get -y install git cmake libsqlite3-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-good libasound2-dev \
 	nano libatlas-base-dev wget gstreamer1.0-plugins-ugly gstreamer1.0-plugins-bad gstreamer1.0-alsa alsa-utils make \
-	libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-libav doxygen
-	
-RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
-	  apt-get install -y libcurl4-openssl-dev libfaad-dev libsoup2.4-dev libgcrypt20-dev sox python-pip python; \
+	libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-libav doxygen; \
+    if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
+	  apt-get -y install libcurl4-openssl-dev libfaad-dev libsoup2.4-dev libgcrypt20-dev sox python-pip python; \
     else \
-	  apt-get install -y openssl clang-format pulseaudio repo binutils autoconf automake autotools-dev libtool pkg-config \
+	  apt-get -y install openssl clang-format pulseaudio repo binutils autoconf automake autotools-dev libtool pkg-config \
 		zlib1g-dev libcunit1-dev libssl-dev libxml2-dev libev-dev libevent-dev libjansson-dev libjemalloc-dev cython \
 		python3-dev python-setuptools libgstreamer-plugins-good1.0-dev; \
-    fi
+    fi; \
+	apt-get clean; \
+    rm -rf /var/lib/apt/lists/*
 	
 ENV BASE=/srv
 
@@ -123,7 +123,7 @@ RUN echo "========== Configuring ALSA Devices ==========" \
 WORKDIR $BASE/sdk-folder
 
 # remove not needed files to reduce image size
-RUN rm -rf ./sdk-source/ && apt-get remove -y make cmake doxygen g++ gcc && apt-get clean
+RUN rm -rf ./sdk-source/ && apt-get remove -y make cmake doxygen g++ gcc
 
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
