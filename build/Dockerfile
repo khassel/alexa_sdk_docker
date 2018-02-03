@@ -7,6 +7,11 @@ ENV myimage=$myimage
 
 RUN apt-get update && apt-get upgrade -y
 
+# need old gcc-version 4.8 due to this error:
+# [100%] Linking CXX executable SampleApp
+#../../KWD/KittAi/src/libKITTAI.so: undefined reference to `snowboy::SnowboyDetect::SetSensitivity(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
+#../../KWD/KittAi/src/libKITTAI.so: undefined reference to `snowboy::SnowboyDetect::SnowboyDetect(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
+
 RUN apt-get -y install gcc-4.8 g++-4.8
 
 RUN apt-get -y install git cmake libsqlite3-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-good libasound2-dev \
@@ -16,7 +21,7 @@ RUN apt-get -y install git cmake libsqlite3-dev libgstreamer-plugins-bad1.0-dev 
 RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
 	  apt-get install -y libcurl4-openssl-dev libfaad-dev libsoup2.4-dev libgcrypt20-dev sox python-pip python; \
     else \
-	  apt-get install -y openssl clang-format pulseaudio  repo binutils autoconf automake autotools-dev libtool pkg-config \
+	  apt-get install -y openssl clang-format pulseaudio repo binutils autoconf automake autotools-dev libtool pkg-config \
 		zlib1g-dev libcunit1-dev libssl-dev libxml2-dev libev-dev libevent-dev libjansson-dev libjemalloc-dev cython \
 		python3-dev python-setuptools libgstreamer-plugins-good1.0-dev; \
     fi
@@ -53,46 +58,44 @@ RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
       && curl -I https://nghttp2.org/; \
       easy_install pip; \
       pip install --user flask requests commentjson; \
-    fi	
+    fi; \
+    python --version; \ 
+	pip --version
 
-RUN python --version && pip --version && cd /usr/bin && ls -la | grep gcc
-
-RUN cd /usr/bin \
- && rm gcc && rm gcc-ar && rm gcc-nm && rm gcc-ranlib \
- && ln -s gcc-4.8 gcc \
- && ln -s gcc-ar-4.8 gcc-ar \
- && ln -s gcc-nm-4.8 gcc-nm \
- && ln -s gcc-ranlib-4.8 gcc-ranlib
- 
 RUN cd /usr/bin; \
+    rm gcc && rm gcc-ar && rm gcc-nm && rm gcc-ranlib; \
+    ln -s gcc-4.8 gcc; \
+    ln -s gcc-ar-4.8 gcc-ar; \
+    ln -s gcc-nm-4.8 gcc-nm; \
+    ln -s gcc-ranlib-4.8 gcc-ranlib; \
     if [ -f g++ ]; then \
       rm g++; \
     fi; \
-	ln -s g++-4.8 g++
- 
-RUN gcc --version && g++ --version
+	ln -s g++-4.8 g++; \
+    gcc --version; \
+    g++ --version
 
 RUN cd $BASE/sdk-folder/third-party \
  && wget -c http://www.portaudio.com/archives/pa_stable_v190600_20161030.tgz \
  && tar zxf pa_stable_v190600_20161030.tgz \
+ && rm -rf ./pa_stable_v190600_20161030.tgz \
  && cd portaudio \
  && ./configure --without-jack \
- && make \
- && rm -rf ./pa_stable_v190600_20161030.tgz
-
-# todo: https://github.com/alexa/avs-device-sdk/issues/463
+ && make
 
 RUN cd $BASE/sdk-folder/sdk-source && git clone --depth 1 -b master --single-branch git://github.com/alexa/avs-device-sdk.git 
 
 RUN cd $BASE/sdk-folder/third-party && git clone --depth 1 -b master --single-branch https://github.com/Kitt-AI/snowboy.git
 
-# Fix im Quelltext wegen compile error (todo: mit sed lösen):
+# Fix in KittAi source because of compile error (only rpi):
 # https://github.com/alexa/avs-device-sdk/issues/385
+# todo: solve with sed instead of patched source file
 COPY KittAiKeyWordDetector.cpp $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src/KittAiKeyWordDetector.cpp1
-RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
-      cd $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src; \
+RUN cd $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src; \
+    if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
       cp KittAiKeyWordDetector.cpp1 KittAiKeyWordDetector.cpp; \
-    fi
+    fi; \
+	rm KittAiKeyWordDetector.cpp1
 
 WORKDIR $BASE/sdk-folder/sdk-build
 
@@ -114,12 +117,13 @@ RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
  
 RUN make SampleApp -j2
  
-RUN apt-get clean  
-
 RUN echo "========== Configuring ALSA Devices ==========" \
  && printf "pcm.!default {\n  type asym\n   playback.pcm {\n     type plug\n     slave.pcm \"hw:0,0\"\n   }\n   capture.pcm {\n     type plug\n     slave.pcm \"hw:1,0\"\n   }\n}" >> /root/.asoundrc
 
 WORKDIR $BASE/sdk-folder
+
+# remove not needed files to reduce image size
+RUN rm -rf ./sdk-source/ && apt-get remove -y make cmake doxygen g++ gcc && apt-get clean
 
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
