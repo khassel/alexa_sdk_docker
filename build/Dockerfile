@@ -97,6 +97,12 @@ RUN cd $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src; \
     fi; \
 	rm KittAiKeyWordDetector.cpp1
 
+# https://github.com/alexa/avs-device-sdk/issues/469
+RUN if [ "$myimage" != "resin/rpi-raspbian:stretch" ]; then \
+      sed -i "s:static const std\:\:chrono\:\:milliseconds SLEEP_AFTER_END_OF_AUDIO{300}:static const std\:\:chrono\:\:milliseconds SLEEP_AFTER_END_OF_AUDIO{600}:" \ 
+        $BASE/sdk-folder/sdk-source/avs-device-sdk/MediaPlayer/src/MediaPlayer.cpp; \
+    fi
+	
 WORKDIR $BASE/sdk-folder/sdk-build
 
 RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
