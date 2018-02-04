@@ -38,7 +38,7 @@ RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
       pip install flask commentjson requests; \
 	else \
       cd $BASE/sdk-folder/third-party \
-      && git clone https://github.com/tatsuhiro-t/nghttp2.git \
+      && git clone --depth 1 --single-branch https://github.com/tatsuhiro-t/nghttp2.git \
       && cd nghttp2 \
       && autoreconf -i \
       && automake \
