@@ -5,7 +5,7 @@ MAINTAINER Karsten Hassel
 ARG myimage
 ENV myimage=$myimage
 
-RUN apt-get update && apt-get upgrade -y
+RUN arch && apt-get update && apt-get upgrade -y
 
 # need old gcc-version 4.8 due to this error:
 # [100%] Linking CXX executable SampleApp
@@ -92,14 +92,14 @@ RUN cd $BASE/sdk-folder/third-party && git clone --depth 1 -b master --single-br
 # todo: solve with sed instead of patched source file
 COPY KittAiKeyWordDetector.cpp $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src/KittAiKeyWordDetector.cpp1
 RUN cd $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src; \
-    if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
+    if [ "$myimage" = "resin/rpi-raspbian:stretch" ] || [ "$myimage" = "arm32v7/ubuntu:16.04" ]; then \
       cp KittAiKeyWordDetector.cpp1 KittAiKeyWordDetector.cpp; \
     fi; \
 	rm KittAiKeyWordDetector.cpp1
 
 WORKDIR $BASE/sdk-folder/sdk-build
 
-RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
+RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ] || [ "$myimage" = "arm32v7/ubuntu:16.04" ]; then \
 	  myos=rpi; \
     else \
 	  myos=ubuntu64; \
