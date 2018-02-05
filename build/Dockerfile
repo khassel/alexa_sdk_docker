@@ -23,8 +23,7 @@ RUN apt-get -y install gcc-4.8 g++-4.8; \
 		zlib1g-dev libcunit1-dev libssl-dev libxml2-dev libev-dev libevent-dev libjansson-dev libjemalloc-dev cython \
 		python3-dev python-setuptools libgstreamer-plugins-good1.0-dev; \
     fi; \
-	apt-get clean; \
-    rm -rf /var/lib/apt/lists/*
+	apt-get clean
 	
 ENV BASE=/srv
 
@@ -127,9 +126,6 @@ RUN echo "========== Configuring ALSA Devices ==========" \
  && printf "pcm.!default {\n  type asym\n   playback.pcm {\n     type plug\n     slave.pcm \"hw:0,0\"\n   }\n   capture.pcm {\n     type plug\n     slave.pcm \"hw:1,0\"\n   }\n}" >> /root/.asoundrc
 
 WORKDIR $BASE/sdk-folder
-
-# remove not needed files to reduce image size
-RUN rm -rf ./sdk-source/ && apt-get remove -y make cmake doxygen g++ gcc
 
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
