@@ -38,7 +38,7 @@ RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
       pip install flask commentjson requests; \
 	else \
       cd $BASE/sdk-folder/third-party \
-      && git clone https://github.com/tatsuhiro-t/nghttp2.git \
+      && git clone --depth 1 --single-branch https://github.com/tatsuhiro-t/nghttp2.git \
       && cd nghttp2 \
       && autoreconf -i \
       && automake \
@@ -97,6 +97,12 @@ RUN cd $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src; \
     fi; \
 	rm KittAiKeyWordDetector.cpp1
 
+# https://github.com/alexa/avs-device-sdk/issues/469
+RUN if [ "$myimage" != "resin/rpi-raspbian:stretch" ]; then \
+      sed -i "s:static const std\:\:chrono\:\:milliseconds SLEEP_AFTER_END_OF_AUDIO{300}:static const std\:\:chrono\:\:milliseconds SLEEP_AFTER_END_OF_AUDIO{600}:" \ 
+        $BASE/sdk-folder/sdk-source/avs-device-sdk/MediaPlayer/src/MediaPlayer.cpp; \
+    fi
+	
 WORKDIR $BASE/sdk-folder/sdk-build
 
 RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
@@ -121,9 +127,6 @@ RUN echo "========== Configuring ALSA Devices ==========" \
  && printf "pcm.!default {\n  type asym\n   playback.pcm {\n     type plug\n     slave.pcm \"hw:0,0\"\n   }\n   capture.pcm {\n     type plug\n     slave.pcm \"hw:1,0\"\n   }\n}" >> /root/.asoundrc
 
 WORKDIR $BASE/sdk-folder
-
-# remove not needed files to reduce image size
-RUN rm -rf ./sdk-source/ && apt-get remove -y make cmake doxygen g++ gcc
 
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
