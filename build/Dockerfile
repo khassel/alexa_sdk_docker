@@ -23,7 +23,8 @@ RUN apt-get -y install gcc-4.8 g++-4.8; \
 		zlib1g-dev libcunit1-dev libssl-dev libxml2-dev libev-dev libevent-dev libjansson-dev libjemalloc-dev cython \
 		python3-dev python-setuptools libgstreamer-plugins-good1.0-dev; \
     fi; \
-	apt-get clean
+	apt-get clean; \
+    rm -rf /var/lib/apt/lists/*
 	
 ENV BASE=/srv
 
