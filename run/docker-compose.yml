@@ -4,23 +4,20 @@ services:
   alexa:
     container_name: al
     image: karsten13/alexa_sdk:rpi
-    ports:
-      - 3000:3000
     volumes:
       - ./AlexaClientSDKConfig.json:/srv/sdk-folder/sdk-build/Integration/AlexaClientSDKConfig.json
 #      - ./Hilde.pmdl:/srv/sdk-folder/third-party/snowboy/resources/alexa.umdl
-    privileged: true
-    network_mode: host
     environment:
-      # audio params
+      # audio params, choose "3.5mm" or "HDMI"
       - Audio=3.5mm
     devices:
       - /dev/snd
       - /dev/bus/usb
     entrypoint:
       - ./entrypoint.sh
-      - DEBUG9
+#      - DEBUG9
 #    entrypoint: /bin/bash
 #    stdin_open: true
 #    tty: true      
     restart: always
+
