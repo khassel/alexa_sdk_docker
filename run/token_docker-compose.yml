@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  alexa:
+    container_name: al
+    image: karsten13/alexa_sdk:ubuntu64
+    ports:
+      - 3000:3000
+    volumes:
+      - ./AlexaClientSDKConfig.json:/srv/sdk-folder/sdk-build/Integration/AlexaClientSDKConfig.json
+    privileged: true
+    network_mode: host
+    entrypoint: 
+      - python
+      - ./sdk-build/AuthServer/AuthServer.py
+#    entrypoint: /bin/bash
+#    stdin_open: true
+#    tty: true      
