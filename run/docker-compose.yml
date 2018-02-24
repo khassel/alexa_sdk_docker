@@ -19,6 +19,6 @@ services:
 #      - DEBUG9
 #    entrypoint: /bin/bash
 #    stdin_open: true
-#    tty: true      
+    tty: true      
     restart: always
 
