@@ -9,8 +9,12 @@ services:
       - ./app-data:/srv/sdk-folder/application-necessities
 #      - ./Hilde.pmdl:/srv/sdk-folder/third-party/snowboy/resources/alexa.umdl
     environment:
+      # default params
       - KITT_AI_SENSITIVITY=0.6
       - KITT_AI_APPLY_FRONT_END_PROCESSING=true
+      # params for Hilde.pmdl:
+#      - KITT_AI_SENSITIVITY=0.47
+#      - KITT_AI_APPLY_FRONT_END_PROCESSING=false
       # audio params, choose "3.5mm" or "HDMI"
       - Audio=3.5mm
     devices:
