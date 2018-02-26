@@ -85,7 +85,7 @@ RUN cd $BASE/sdk-folder/third-party \
 
 RUN cd $BASE/sdk-folder/sdk-source && git clone --depth 1 -b v1.5 --single-branch git://github.com/alexa/avs-device-sdk.git 
 
-RUN cd $BASE/sdk-folder/third-party && git clone --depth 1 -b 1.2.0 --single-branch https://github.com/Kitt-AI/snowboy.git
+RUN cd $BASE/sdk-folder/third-party && git clone --depth 1 -b 1.3.0 --single-branch https://github.com/Kitt-AI/snowboy.git
 
 # Fix in KittAi source because of compile error (only rpi):
 # https://github.com/alexa/avs-device-sdk/issues/385
@@ -98,7 +98,7 @@ RUN cd $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src; \
 	rm KittAiKeyWordDetector.cpp1
 
 # needed for Kitt-AI version 1.3.0	
-#RUN cp $BASE/sdk-folder/third-party/snowboy/resources/alexa/alexa-avs-sample-app/alexa.umdl $BASE/sdk-folder/third-party/snowboy/resources/alexa.umdl
+RUN cp $BASE/sdk-folder/third-party/snowboy/resources/alexa/alexa-avs-sample-app/alexa.umdl $BASE/sdk-folder/third-party/snowboy/resources/alexa.umdl
 	
 # https://github.com/alexa/avs-device-sdk/issues/469
 RUN if [ "$myimage" != "resin/rpi-raspbian:stretch" ]; then \
