@@ -5,10 +5,12 @@ services:
     container_name: al
     image: karsten13/alexa_sdk:rpi
     volumes:
+      - /opt/vc:/opt/vc/:ro
       - ./AlexaClientSDKConfig.json:/srv/sdk-folder/sdk-build/Integration/AlexaClientSDKConfig.json
       - ./app-data:/srv/sdk-folder/application-necessities
 #      - ./Hilde.pmdl:/srv/sdk-folder/third-party/snowboy/resources/alexa.umdl
     environment:
+      - LD_LIBRARY_PATH=/opt/vc/lib
       # audio params, choose "3.5mm" or "HDMI"
       - Audio=3.5mm
     devices:
