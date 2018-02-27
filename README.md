@@ -75,3 +75,8 @@ Therefore you have to comment out this line
 #      - ./Hilde.pmdl:/srv/sdk-folder/third-party/snowboy/resources/alexa.umdl
 ```
 in ~/alexa/run/docker-compose.yml and replace "Hilde.pdml" with your "xy.pdml". The xy.pdml is expected in ~/alexa/run.
+Additionally you have to set the environment parameter 
+```bash
+KITT_AI_APPLY_FRONT_END_PROCESSING=false
+```
+and play with the KITT_AI_SENSITIVITY parameter until it fits (default is 0.6, for "Hilde.pdml" the results are better with 0.47).

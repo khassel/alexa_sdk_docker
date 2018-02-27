@@ -89,13 +89,10 @@ RUN cd $BASE/sdk-folder/third-party && git clone --depth 1 -b v1.3.0 --single-br
 
 # Fix in KittAi source because of compile error (only rpi):
 # https://github.com/alexa/avs-device-sdk/issues/385
-# todo: solve with sed instead of patched source file
-COPY KittAiKeyWordDetector.cpp $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src/KittAiKeyWordDetector.cpp1
 RUN cd $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src; \
     if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
-      cp KittAiKeyWordDetector.cpp1 KittAiKeyWordDetector.cpp; \
-    fi; \
-	rm KittAiKeyWordDetector.cpp1
+      sed -i "s:m_maxSamplesPerPush{(audioFormat.sampleRateHz \/ HERTZ_PER_KILOHERTZ) \* msToPushPerIteration.count()}:m_maxSamplesPerPush{(audioFormat.sampleRateHz \/ HERTZ_PER_KILOHERTZ) \* static_cast<unsigned int>(msToPushPerIteration.count())}:" KittAiKeyWordDetector.cpp; \
+    fi
 
 # needed for Kitt-AI version 1.3.0	
 RUN cp $BASE/sdk-folder/third-party/snowboy/resources/alexa/alexa-avs-sample-app/alexa.umdl $BASE/sdk-folder/third-party/snowboy/resources/alexa.umdl
