@@ -24,16 +24,12 @@ cd ./sdk-build
 
 if [ "$KITT_AI_SENSITIVITY" != "0.6" ] || [ "$KITT_AI_APPLY_FRONT_END_PROCESSING" != "true" ]; then
   # file nur patchen wenn notwendig
-  sed -i "s:KITT_AI_SENSITIVITY = 0.6:KITT_AI_SENSITIVITY = $KITT_AI_SENSITIVITY:" /srv/sdk-folder/sdk-source/avs-device-sdk/SampleApp/src/SampleApplication.cpp
-  sed -i "s:KITT_AI_APPLY_FRONT_END_PROCESSING = true:KITT_AI_APPLY_FRONT_END_PROCESSING = $KITT_AI_APPLY_FRONT_END_PROCESSING:" /srv/sdk-folder/sdk-source/avs-device-sdk/SampleApp/src/SampleApplication.cpp
+  sed -i "s:KITT_AI_SENSITIVITY = 0.6:KITT_AI_SENSITIVITY = $KITT_AI_SENSITIVITY:" /srv/sdk-folder/sdk-source/avs-device-sdk/KWD/KWDProvider/src/KeywordDetectorProvider.cpp
+  sed -i "s:KITT_AI_APPLY_FRONT_END_PROCESSING = true:KITT_AI_APPLY_FRONT_END_PROCESSING = $KITT_AI_APPLY_FRONT_END_PROCESSING:" /srv/sdk-folder/sdk-source/avs-device-sdk/KWD/KWDProvider/src/KeywordDetectorProvider.cpp
+  make SampleApp -j2
 fi  
-
-# immer make, könnte andere alexa.umdl von aussen reingemountet sein
-make SampleApp -j2
 
 cd ./SampleApp/src \
   && ./SampleApp \
   /srv/sdk-folder/sdk-build/Integration/AlexaClientSDKConfig.json \
-  /srv/sdk-folder/third-party/snowboy/resources/ $1
-
-  
+  /srv/sdk-folder/third-party/snowboy/resources/alexa/alexa-avs-sample-app/ $1

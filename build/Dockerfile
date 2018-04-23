@@ -83,7 +83,7 @@ RUN cd $BASE/sdk-folder/third-party \
  && ./configure --without-jack \
  && make
 
-RUN cd $BASE/sdk-folder/sdk-source && git clone --depth 1 -b v1.6 --single-branch git://github.com/alexa/avs-device-sdk.git 
+RUN cd $BASE/sdk-folder/sdk-source && git clone --depth 1 -b master --single-branch git://github.com/alexa/avs-device-sdk.git 
 
 RUN cd $BASE/sdk-folder/third-party && git clone --depth 1 -b master --single-branch https://github.com/Kitt-AI/snowboy.git
 
@@ -94,9 +94,6 @@ RUN cd $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src; \
       sed -i "s:m_maxSamplesPerPush{(audioFormat.sampleRateHz \/ HERTZ_PER_KILOHERTZ) \* msToPushPerIteration.count()}:m_maxSamplesPerPush{(audioFormat.sampleRateHz \/ HERTZ_PER_KILOHERTZ) \* static_cast<unsigned int>(msToPushPerIteration.count())}:" KittAiKeyWordDetector.cpp; \
     fi
 
-# needed for Kitt-AI version 1.3.0	
-RUN cp $BASE/sdk-folder/third-party/snowboy/resources/alexa/alexa-avs-sample-app/alexa.umdl $BASE/sdk-folder/third-party/snowboy/resources/alexa.umdl
-	
 # https://github.com/alexa/avs-device-sdk/issues/469
 RUN if [ "$myimage" != "resin/rpi-raspbian:stretch" ]; then \
       sed -i "s:static const std\:\:chrono\:\:milliseconds SLEEP_AFTER_END_OF_AUDIO{300}:static const std\:\:chrono\:\:milliseconds SLEEP_AFTER_END_OF_AUDIO{600}:" \ 
