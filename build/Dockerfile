@@ -83,7 +83,7 @@ RUN cd $BASE/sdk-folder/third-party \
  && ./configure --without-jack \
  && make
 
-RUN cd $BASE/sdk-folder/sdk-source && git clone --depth 1 -b master --single-branch git://github.com/alexa/avs-device-sdk.git 
+RUN cd $BASE/sdk-folder/sdk-source && git clone --depth 1 -b v1.6 --single-branch git://github.com/alexa/avs-device-sdk.git 
 
 RUN cd $BASE/sdk-folder/third-party && git clone --depth 1 -b master --single-branch https://github.com/Kitt-AI/snowboy.git
 
