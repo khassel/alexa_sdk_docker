@@ -2,8 +2,8 @@ ARG myimage
 FROM $myimage
 MAINTAINER Karsten Hassel
 
-ARG myimage
-ENV myimage=$myimage
+ARG BuildEnv
+ENV BuildEnv=$BuildEnv
 
 RUN apt-get update && apt-get upgrade -y
 
@@ -16,7 +16,7 @@ RUN apt-get -y install gcc-4.8 g++-4.8; \
     apt-get -y install git cmake libsqlite3-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-good libasound2-dev \
 	nano libatlas-base-dev wget gstreamer1.0-plugins-ugly gstreamer1.0-plugins-bad gstreamer1.0-alsa alsa-utils make \
 	libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-libav doxygen; \
-    if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
+    if [ "$BuildEnv" = "rpi" ]; then \
 	  apt-get -y install libcurl4-openssl-dev libfaad-dev libsoup2.4-dev libgcrypt20-dev sox python-pip python; \
     else \
 	  apt-get -y install openssl clang-format pulseaudio repo binutils autoconf automake autotools-dev libtool pkg-config \
@@ -33,10 +33,10 @@ RUN cd $BASE \
  && mkdir sdk-build sdk-source third-party application-necessities \
  && cd application-necessities && mkdir sound-files
 
-RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
+RUN if [ "$BuildEnv" = "rpi" ]; then \
       pip install --upgrade setuptools; \
       pip install flask commentjson requests; \
-	else \
+    else \
       cd $BASE/sdk-folder/third-party \
       && git clone --depth 1 --single-branch https://github.com/tatsuhiro-t/nghttp2.git \
       && cd nghttp2 \
@@ -90,19 +90,19 @@ RUN cd $BASE/sdk-folder/third-party && git clone --depth 1 -b $KittAI_Version --
 # Fix in KittAi source because of compile error (only rpi):
 # https://github.com/alexa/avs-device-sdk/issues/385
 RUN cd $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src; \
-    if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
+    if [ "$BuildEnv" = "rpi" ]; then \
       sed -i "s:m_maxSamplesPerPush{(audioFormat.sampleRateHz \/ HERTZ_PER_KILOHERTZ) \* msToPushPerIteration.count()}:m_maxSamplesPerPush{(audioFormat.sampleRateHz \/ HERTZ_PER_KILOHERTZ) \* static_cast<unsigned int>(msToPushPerIteration.count())}:" KittAiKeyWordDetector.cpp; \
     fi
 
 # https://github.com/alexa/avs-device-sdk/issues/469
-RUN if [ "$myimage" != "resin/rpi-raspbian:stretch" ]; then \
+RUN if [ "$BuildEnv" != "rpi" ]; then \
       sed -i "s:static const std\:\:chrono\:\:milliseconds SLEEP_AFTER_END_OF_AUDIO{300}:static const std\:\:chrono\:\:milliseconds SLEEP_AFTER_END_OF_AUDIO{600}:" \ 
         $BASE/sdk-folder/sdk-source/avs-device-sdk/MediaPlayer/src/MediaPlayer.cpp; \
     fi
 	
 WORKDIR $BASE/sdk-folder/sdk-build
 
-RUN if [ "$myimage" = "resin/rpi-raspbian:stretch" ]; then \
+RUN if [ "$BuildEnv" = "rpi" ]; then \
 	  myos=rpi; \
     else \
 	  myos=ubuntu64; \
