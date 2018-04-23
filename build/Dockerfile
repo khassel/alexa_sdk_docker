@@ -83,9 +83,9 @@ RUN cd $BASE/sdk-folder/third-party \
  && ./configure --without-jack \
  && make
 
-RUN cd $BASE/sdk-folder/sdk-source && git clone --depth 1 -b master --single-branch git://github.com/alexa/avs-device-sdk.git 
+RUN cd $BASE/sdk-folder/sdk-source && git clone --depth 1 -b $SDK_Version --single-branch git://github.com/alexa/avs-device-sdk.git 
 
-RUN cd $BASE/sdk-folder/third-party && git clone --depth 1 -b master --single-branch https://github.com/Kitt-AI/snowboy.git
+RUN cd $BASE/sdk-folder/third-party && git clone --depth 1 -b $KittAI_Version --single-branch https://github.com/Kitt-AI/snowboy.git
 
 # Fix in KittAi source because of compile error (only rpi):
 # https://github.com/alexa/avs-device-sdk/issues/385
