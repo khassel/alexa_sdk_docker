@@ -25,5 +25,3 @@ script:
 - docker images
 - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
 - docker push "$DOCKER_USER"/alexa_sdk:"$BuildEnv"_"$SDK_Version";
-- docker tag "$DOCKER_USER"/alexa_sdk:"$BuildEnv"_"$SDK_Version" "$DOCKER_USER"/alexa_sdk:"$BuildEnv";
-- docker push "$DOCKER_USER"/alexa_sdk:"$BuildEnv";
