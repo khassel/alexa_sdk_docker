@@ -5,6 +5,14 @@ MAINTAINER Karsten Hassel
 ARG BuildEnv
 ENV BuildEnv=$BuildEnv
 
+# params for AlexaClientSDKConfig.json
+ENV SDK_CBL_AUTH_DELEGATE_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/cblAuthDelegate.db \
+    SDK_MISC_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/miscDatabase.db \
+    SDK_SQLITE_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/alerts.db \
+    SDK_SQLITE_SETTINGS_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/settings.db \
+    SDK_CERTIFIED_SENDER_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/certifiedSender.db \
+    SDK_NOTIFICATIONS_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/notifications.db
+
 RUN apt-get update && apt-get upgrade -y
 
 # need old gcc-version 4.8 due to this error:
