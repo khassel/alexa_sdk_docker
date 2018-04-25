@@ -3,10 +3,9 @@ version: '3'
 services:
   alexa:
     container_name: al
-    image: karsten13/alexa_sdk:rpi
+    image: karsten13/alexa_sdk:${BuildEnv}_${SDK_Version}
     volumes:
       - /opt/vc:/opt/vc/:ro
-      - ./AlexaClientSDKConfig.json:/srv/sdk-folder/sdk-build/Integration/AlexaClientSDKConfig.json
       - ./app-data:/srv/sdk-folder/application-necessities
 #      - ./Hilde.pmdl:/srv/sdk-folder/third-party/snowboy/resources/alexa.umdl
     environment:
@@ -19,6 +18,11 @@ services:
 #      - KITT_AI_APPLY_FRONT_END_PROCESSING=false
       # audio params, choose "3.5mm" or "HDMI"
       - Audio=3.5mm
+      # params for AlexaClientSDKConfig.json:
+      - SETTING_LOCALE_VALUE=de-DE
+      - SDK_CONFIG_DEVICE_SERIAL_NUMBER=123456
+      - SDK_CONFIG_CLIENT_ID=
+      - SDK_CONFIG_PRODUCT_ID=
     devices:
       - /dev/snd
       - /dev/bus/usb
