@@ -3,12 +3,13 @@ version: '3'
 services:
   alexa:
     container_name: al
-    image: karsten13/alexa_sdk:${BuildEnv}_${SDK_Version}
     volumes:
       - /opt/vc:/opt/vc/:ro
       - ./app-data:/srv/sdk-folder/application-necessities
 #      - ./Hilde.pmdl:/srv/sdk-folder/third-party/snowboy/resources/alexa.umdl
     environment:
+      - BuildEnv
+      - SDK_Version
       - LD_LIBRARY_PATH=/opt/vc/lib
       # default params
       - KITT_AI_SENSITIVITY=0.6
@@ -23,6 +24,7 @@ services:
       - SDK_CONFIG_DEVICE_SERIAL_NUMBER=123456
       - SDK_CONFIG_CLIENT_ID=
       - SDK_CONFIG_PRODUCT_ID=
+    image: karsten13/alexa_sdk:${BuildEnv}_${SDK_Version}
     devices:
       - /dev/snd
       - /dev/bus/usb
