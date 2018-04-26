@@ -7,13 +7,13 @@
 
 The setup for graphical desktop is not needed.
 
-### Setup alexa docker image
+### Setup
 -	```bash
 	git clone --depth 1 -b rpi https://github.com/khassel/alexa_sdk_docker.git ~/alexa
 	```
 	
 -	```bash
-	docker pull karsten13/alexa_sdk:rpi
+	docker pull karsten13/alexa_sdk:rpi_v1.7
 	```
 	
 ## Setup for linux
@@ -22,45 +22,47 @@ The setup for graphical desktop is not needed.
 - [docker-compose](https://docs.docker.com/compose/install/)
 
 
-### Setup alexa docker image
+### Setup
 -	```bash
 	git clone --depth 1 -b ubuntu64 https://github.com/khassel/alexa_sdk_docker.git ~/alexa
 	```
 	
 -	```bash
-	docker pull karsten13/alexa_sdk:ubuntu64
+	docker pull karsten13/alexa_sdk:ubuntu64_v1.7
 	```
 
-## Next setup steps for raspberry-pi and linux
-	
--	Before starting the container you need to put a valid "AlexaClientSDKConfig.json" file into the folder ~/alexa/run. If you have this file you can skip the next steps in this section.
--   Otherwise you have to create the "AlexaClientSDKConfig.json" file. You find a template in ~/alexa/run, copy it to "AlexaClientSDKConfig.json".
+## Next setup steps for both raspberry-pi and linux
+### Preparing for the first start of the container
 
-	```bash
-	nano ~/alexa/run/AlexaClientSDKConfig.json
+-	Before the first start of the container you need to put valid parameters in the `docker-compose.yml` file in the folder ~/alexa/run. In the environment section of `docker-compose.yml` fill in the following (missing) values:
 	```
-	Set the params "clientSecret", "clientId" and "productId". How to get these values? See the documentation [here](https://github.com/alexa/avs-device-sdk/wiki/Ubuntu-Linux-Quick-Start-Guide) for more info (Register a Device).
--	Now you have to obtain a valid refresh token. Start the docker container with
-	```bash
-	docker-compose -f token_docker-compose.yml up
+      - SETTING_LOCALE_VALUE=de-DE
+      - SDK_CONFIG_DEVICE_SERIAL_NUMBER=123456
+      - SDK_CONFIG_CLIENT_ID=
+      - SDK_CONFIG_PRODUCT_ID=
 	```
--   Wait for this message
-	```bash
-	Creating al ... done
-	Attaching to al
-	al       |  * Running on http://127.0.0.1:3000/ (Press CTRL+C to quit)
+	These values are used in the `AlexaClientSDKConfig.json` file. You find more infos about this [here](https://github.com/alexa/avs-device-sdk/wiki/Create-Security-Profile).
+-   Now goto ```cd ~/alexa/run``` and execute ```docker-compose up -d```. The container will start, wait a moment and execute ```docker logs al``` to see the logs.
+    Search for a similar section in the logs:
 	```
--	Open the url in a browser on the same machine. Log in with your amazon credentials, wait until your browser show the lines
-	```bash
-	The file is written successfully.	
-	Server is shutting down, so you can close this window.
+    ##################################
+    #       NOT YET AUTHORIZED       #
+    ##################################
+    ################################################################################################
+    #       To authorize, browse to: 'https://amazon.com/us/code' and enter the code: {XXXX}       #
+    ################################################################################################
 	```
--	Shutdown the docker container with
-	```bash
-	docker-compose down
+	Follow the instructions [here](https://github.com/alexa/avs-device-sdk/wiki/Ubuntu-Linux-Quick-Start-Guide#run-and-authorize)
+	beginning with Point 3. to Point 7.
+	Execute ```docker logs al``` again to see if the authorization was successful. You should see 
 	```
+    ########################################
+    #       Alexa is currently idle!       #
+    ########################################
+	```
+    Now you can talk with Alexa.
 	
-### Starting alexa docker container
+### Starting and stopping the alexa docker container
 - goto ```cd ~/alexa/run``` and execute ```docker-compose up -d```
 - in case you want to stop it ```docker-compose down```
 - give Alexa ~30 sec. to start, then you can talk with her.
