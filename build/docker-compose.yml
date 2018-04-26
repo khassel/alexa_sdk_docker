@@ -6,7 +6,9 @@ services:
     build: 
       context: ./
       args:
-        myimage: ${myimage}
-        BuildEnv: ${BuildEnv}
+      - myimage
+      - BuildEnv
+      - SDK_Version
+      - KittAI_Version
     container_name: alexa
     image: karsten13/alexa_sdk:${BuildEnv}_${SDK_Version}
