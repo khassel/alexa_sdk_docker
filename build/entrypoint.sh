@@ -33,4 +33,4 @@ fi
 cd ./SampleApp/src \
   && ./SampleApp \
   /srv/sdk-folder/AlexaClientSDKConfig.json \
-  /srv/sdk-folder/third-party/snowboy/resources/alexa/alexa-avs-sample-app/ $1
+  /srv/sdk-folder/third-party/snowboy/resources $1
