@@ -9,7 +9,7 @@ The setup for graphical desktop is not needed.
 
 ### Setup
 -	```bash
-	git clone --depth 1 -b rpi https://github.com/khassel/alexa_sdk_docker.git ~/alexa
+	git clone --depth 1 -b rpi_v1.7 https://github.com/khassel/alexa_sdk_docker.git ~/alexa
 	```
 	
 -	```bash
@@ -24,7 +24,7 @@ The setup for graphical desktop is not needed.
 
 ### Setup
 -	```bash
-	git clone --depth 1 -b ubuntu64 https://github.com/khassel/alexa_sdk_docker.git ~/alexa
+	git clone --depth 1 -b ubuntu64_v1.7 https://github.com/khassel/alexa_sdk_docker.git ~/alexa
 	```
 	
 -	```bash
