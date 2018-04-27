@@ -9,4 +9,4 @@ services:
 #        myimage: "resin/armv7hf-debian:stretch"
         myimage: "resin/rpi-raspbian:stretch"        
     container_name: alexa
-    image: karsten13/alexa_sdk:rpi
+    image: karsten13/alexa_sdk:rpi_v1.6

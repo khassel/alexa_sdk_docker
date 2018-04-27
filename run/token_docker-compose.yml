@@ -3,7 +3,7 @@ version: '3'
 services:
   alexa:
     container_name: al
-    image: karsten13/alexa_sdk:rpi
+    image: karsten13/alexa_sdk:rpi_v1.6
     ports:
       - 3000:3000
     volumes:
