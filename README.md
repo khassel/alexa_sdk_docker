@@ -9,11 +9,11 @@ The setup for graphical desktop is not needed.
 
 ### Setup alexa docker image
 -	```bash
-	git clone --depth 1 -b rpi https://github.com/khassel/alexa_sdk_docker.git ~/alexa
+	git clone --depth 1 -b rpi_v1.6 https://github.com/khassel/alexa_sdk_docker.git ~/alexa
 	```
 	
 -	```bash
-	docker pull karsten13/alexa_sdk:rpi
+	docker pull karsten13/alexa_sdk:rpi_v1.6
 	```
 	
 ## Setup for linux
@@ -24,11 +24,11 @@ The setup for graphical desktop is not needed.
 
 ### Setup alexa docker image
 -	```bash
-	git clone --depth 1 -b ubuntu64 https://github.com/khassel/alexa_sdk_docker.git ~/alexa
+	git clone --depth 1 -b ubuntu64_v1.6 https://github.com/khassel/alexa_sdk_docker.git ~/alexa
 	```
 	
 -	```bash
-	docker pull karsten13/alexa_sdk:ubuntu64
+	docker pull karsten13/alexa_sdk:ubuntu64_v1.6
 	```
 
 ## Next setup steps for raspberry-pi and linux
