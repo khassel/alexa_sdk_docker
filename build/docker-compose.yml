@@ -8,4 +8,4 @@ services:
       args:
         myimage: "ubuntu:16.04"
     container_name: alexa
-    image: karsten13/alexa_sdk:ubuntu64
+    image: karsten13/alexa_sdk:ubuntu64_v1.6
