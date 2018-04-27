@@ -8,8 +8,6 @@ services:
       - ./app-data:/srv/sdk-folder/application-necessities
 #      - ./Hilde.pmdl:/srv/sdk-folder/third-party/snowboy/resources/alexa.umdl
     environment:
-      - BuildEnv
-      - SDK_Version
       - LD_LIBRARY_PATH=/opt/vc/lib
       # default params
       - KITT_AI_SENSITIVITY=0.6
