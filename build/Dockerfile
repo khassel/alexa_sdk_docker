@@ -97,6 +97,11 @@ RUN cd $BASE/sdk-folder/sdk-source && git clone --depth 1 -b $SDK_Version --sing
 ARG KittAI_Version
 RUN cd $BASE/sdk-folder/third-party && git clone --depth 1 -b $KittAI_Version --single-branch https://github.com/Kitt-AI/snowboy.git
 
+RUN if [ "$BuildEnv" = "rpi" ]; then \
+      cd $BASE/sdk-folder/third-party && git clone --depth 1 -b master --single-branch https://github.com/Sensory/alexa-rpi.git; \
+      $BASE/sdk-folder/third-party/alexa-rpi/bin/sdk-license file $BASE/sdk-folder/third-party/alexa-rpi/config/license-key.txt $BASE/sdk-folder/third-party/alexa-rpi/lib/libsnsr.a $BASE/sdk-folder/third-party/alexa-rpi/models/spot-alexa-rpi-20500.snsr $BASE/sdk-folder/third-party/alexa-rpi/models/spot-alexa-rpi-21000.snsr $BASE/sdk-folder/third-party/alexa-rpi/models/spot-alexa-rpi-31000.snsr; \
+    fi;
+ 
 # Fix in KittAi source because of compile error (only rpi):
 # https://github.com/alexa/avs-device-sdk/issues/385
 RUN cd $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src; \
@@ -111,19 +116,32 @@ WORKDIR $BASE/sdk-folder/sdk-build
 
 RUN if [ "$BuildEnv" = "rpi" ]; then \
 	  myos=rpi; \
+      cmake $BASE/sdk-folder/sdk-source/avs-device-sdk \
+		-DKITTAI_KEY_WORD_DETECTOR=ON \
+		-DKITTAI_KEY_WORD_DETECTOR_LIB_PATH=$BASE/sdk-folder/third-party/snowboy/lib/$myos/libsnowboy-detect.a \
+		-DKITTAI_KEY_WORD_DETECTOR_INCLUDE_DIR=$BASE/sdk-folder/third-party/snowboy/include \
+		-DSENSORY_KEY_WORD_DETECTOR=ON \
+		-DSENSORY_KEY_WORD_DETECTOR_LIB_PATH=$BASE/sdk-folder/third-party/alexa-rpi/lib/libsnsr.a \
+		-DSENSORY_KEY_WORD_DETECTOR_INCLUDE_DIR=$BASE/sdk-folder/third-party/alexa-rpi/include \
+		-DGSTREAMER_MEDIA_PLAYER=ON \
+		-DPORTAUDIO=ON \
+		-DPORTAUDIO_LIB_PATH=$BASE/sdk-folder/third-party/portaudio/lib/.libs/libportaudio.a \
+		-DPORTAUDIO_INCLUDE_DIR=$BASE/sdk-folder/third-party/portaudio/include \
+		-DACSDK_EMIT_SENSITIVE_LOGS=ON \
+		-DCMAKE_BUILD_TYPE=DEBUG; \
     else \
 	  myos=ubuntu64; \
-    fi; \
-    cmake $BASE/sdk-folder/sdk-source/avs-device-sdk \
-    -DKITTAI_KEY_WORD_DETECTOR=ON \
-    -DKITTAI_KEY_WORD_DETECTOR_LIB_PATH=$BASE/sdk-folder/third-party/snowboy/lib/$myos/libsnowboy-detect.a \
-    -DKITTAI_KEY_WORD_DETECTOR_INCLUDE_DIR=$BASE/sdk-folder/third-party/snowboy/include \
-    -DGSTREAMER_MEDIA_PLAYER=ON \
-    -DPORTAUDIO=ON \
-    -DPORTAUDIO_LIB_PATH=$BASE/sdk-folder/third-party/portaudio/lib/.libs/libportaudio.a \
-    -DPORTAUDIO_INCLUDE_DIR=$BASE/sdk-folder/third-party/portaudio/include \
-    -DACSDK_EMIT_SENSITIVE_LOGS=ON \
-    -DCMAKE_BUILD_TYPE=DEBUG
+      cmake $BASE/sdk-folder/sdk-source/avs-device-sdk \
+		-DKITTAI_KEY_WORD_DETECTOR=ON \
+		-DKITTAI_KEY_WORD_DETECTOR_LIB_PATH=$BASE/sdk-folder/third-party/snowboy/lib/$myos/libsnowboy-detect.a \
+		-DKITTAI_KEY_WORD_DETECTOR_INCLUDE_DIR=$BASE/sdk-folder/third-party/snowboy/include \
+		-DGSTREAMER_MEDIA_PLAYER=ON \
+		-DPORTAUDIO=ON \
+		-DPORTAUDIO_LIB_PATH=$BASE/sdk-folder/third-party/portaudio/lib/.libs/libportaudio.a \
+		-DPORTAUDIO_INCLUDE_DIR=$BASE/sdk-folder/third-party/portaudio/include \
+		-DACSDK_EMIT_SENSITIVE_LOGS=ON \
+		-DCMAKE_BUILD_TYPE=DEBUG; \
+    fi;
  
 RUN make SampleApp -j2
  
