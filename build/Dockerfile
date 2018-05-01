@@ -1,111 +1,26 @@
-ARG myimage
-FROM $myimage
+ARG SDK_Version
+FROM karsten13/alexa_sdk_base:$SDK_Version
 MAINTAINER Karsten Hassel
 
-ARG BuildEnv
-ENV BuildEnv=$BuildEnv
+ARG WakeWordEngine
+ENV WakeWordEngine=$WakeWordEngine
 
-# params for AlexaClientSDKConfig.json
-ENV SDK_CBL_AUTH_DELEGATE_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/cblAuthDelegate.db \
-    SDK_MISC_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/miscDatabase.db \
-    SDK_SQLITE_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/alerts.db \
-    SDK_SQLITE_SETTINGS_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/settings.db \
-    SDK_CERTIFIED_SENDER_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/certifiedSender.db \
-    SDK_NOTIFICATIONS_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/notifications.db
-
-RUN apt-get update && apt-get upgrade -y
-
-# need old gcc-version 4.8 due to this error:
-# [100%] Linking CXX executable SampleApp
-#../../KWD/KittAi/src/libKITTAI.so: undefined reference to `snowboy::SnowboyDetect::SetSensitivity(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
-#../../KWD/KittAi/src/libKITTAI.so: undefined reference to `snowboy::SnowboyDetect::SnowboyDetect(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
-
-RUN apt-get -y install gcc-4.8 g++-4.8; \
-    apt-get -y install git cmake libsqlite3-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-good libasound2-dev \
-	nano libatlas-base-dev wget gstreamer1.0-plugins-ugly gstreamer1.0-plugins-bad gstreamer1.0-alsa alsa-utils make \
-	libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-libav doxygen; \
-    if [ "$BuildEnv" = "rpi" ]; then \
-	  apt-get -y install libcurl4-openssl-dev libfaad-dev libsoup2.4-dev libgcrypt20-dev sox python-pip python; \
-    else \
-	  apt-get -y install openssl clang-format pulseaudio repo binutils autoconf automake autotools-dev libtool pkg-config \
-		zlib1g-dev libcunit1-dev libssl-dev libxml2-dev libev-dev libevent-dev libjansson-dev libjemalloc-dev cython \
-		python3-dev python-setuptools libgstreamer-plugins-good1.0-dev; \
-    fi; \
-	apt-get clean; \
-    rm -rf /var/lib/apt/lists/*
-	
-ENV BASE=/srv
-
-RUN cd $BASE \
- && mkdir sdk-folder && cd sdk-folder \
- && mkdir sdk-build sdk-source third-party application-necessities \
- && cd application-necessities && mkdir sound-files
-
-RUN if [ "$BuildEnv" = "rpi" ]; then \
-      pip install --upgrade setuptools; \
-      pip install flask commentjson requests; \
-    else \
-      cd $BASE/sdk-folder/third-party \
-      && git clone --depth 1 --single-branch https://github.com/tatsuhiro-t/nghttp2.git \
-      && cd nghttp2 \
-      && autoreconf -i \
-      && automake \
-      && autoconf \
-      && ./configure \
-      && make \
-      && make install; \
-      cd $BASE/sdk-folder/third-party \
-      && wget http://curl.haxx.se/download/curl-7.54.0.tar.bz2 \
-      && tar -xvjf curl-7.54.0.tar.bz2 \
-      && cd curl-7.54.0 \
-      && ./configure --with-nghttp2=/usr/local --with-ssl \
-      && make \
-      && make install \
-	  && rm -rf ../curl-7.54.0.tar.bz2 \
-      && ldconfig \
-      && curl -I https://nghttp2.org/; \
-      easy_install pip; \
-      pip install --user flask requests commentjson; \
-    fi; \
-    python --version; \ 
-	pip --version
-
-RUN cd /usr/bin; \
-    rm gcc && rm gcc-ar && rm gcc-nm && rm gcc-ranlib; \
-    ln -s gcc-4.8 gcc; \
-    ln -s gcc-ar-4.8 gcc-ar; \
-    ln -s gcc-nm-4.8 gcc-nm; \
-    ln -s gcc-ranlib-4.8 gcc-ranlib; \
-    if [ -f g++ ]; then \
-      rm g++; \
-    fi; \
-	ln -s g++-4.8 g++; \
-    gcc --version; \
-    g++ --version
-
-RUN cd $BASE/sdk-folder/third-party \
- && wget -c http://www.portaudio.com/archives/pa_stable_v190600_20161030.tgz \
- && tar zxf pa_stable_v190600_20161030.tgz \
- && rm -rf ./pa_stable_v190600_20161030.tgz \
- && cd portaudio \
- && ./configure --without-jack \
- && make
-
-ARG SDK_Version
-RUN cd $BASE/sdk-folder/sdk-source && git clone --depth 1 -b $SDK_Version --single-branch git://github.com/alexa/avs-device-sdk.git 
-
-ARG KittAI_Version
-RUN cd $BASE/sdk-folder/third-party && git clone --depth 1 -b $KittAI_Version --single-branch https://github.com/Kitt-AI/snowboy.git
-
-# Fix in KittAi source because of compile error (only rpi):
-# https://github.com/alexa/avs-device-sdk/issues/385
-RUN cd $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src; \
-    if [ "$BuildEnv" = "rpi" ]; then \
-      sed -i "s:m_maxSamplesPerPush{(audioFormat.sampleRateHz \/ HERTZ_PER_KILOHERTZ) \* msToPushPerIteration.count()}:m_maxSamplesPerPush{(audioFormat.sampleRateHz \/ HERTZ_PER_KILOHERTZ) \* static_cast<unsigned int>(msToPushPerIteration.count())}:" KittAiKeyWordDetector.cpp; \
+ARG KittAI_Version 
+ARG Sensory_Version
+RUN if [ "$WakeWordEngine" = "kittai" ]; then \
+      cd $BASE/sdk-folder/third-party && git clone --depth 1 -b $KittAI_Version --single-branch https://github.com/Kitt-AI/snowboy.git; \
+      # Fix in KittAi source because of compile error (only rpi):
+      # https://github.com/alexa/avs-device-sdk/issues/385
+      cd $BASE/sdk-folder/sdk-source/avs-device-sdk/KWD/KittAi/src; \
+      if [ "$BuildEnv" = "rpi" ]; then \
+        sed -i "s:m_maxSamplesPerPush{(audioFormat.sampleRateHz \/ HERTZ_PER_KILOHERTZ) \* msToPushPerIteration.count()}:m_maxSamplesPerPush{(audioFormat.sampleRateHz \/ HERTZ_PER_KILOHERTZ) \* static_cast<unsigned int>(msToPushPerIteration.count())}:" KittAiKeyWordDetector.cpp; \
+      fi; \
+      # needed since Kitt-AI version 1.3.0	
+      cp $BASE/sdk-folder/third-party/snowboy/resources/alexa/alexa-avs-sample-app/alexa.umdl $BASE/sdk-folder/third-party/snowboy/resources/alexa.umdl; \
+    elif [ "$WakeWordEngine" = "sensory" ]; then \
+      cd $BASE/sdk-folder/third-party && git clone --depth 1 -b $Sensory_Version --single-branch https://github.com/Sensory/alexa-rpi.git; \
+      $BASE/sdk-folder/third-party/alexa-rpi/bin/sdk-license file $BASE/sdk-folder/third-party/alexa-rpi/config/license-key.txt $BASE/sdk-folder/third-party/alexa-rpi/lib/libsnsr.a $BASE/sdk-folder/third-party/alexa-rpi/models/spot-alexa-rpi-20500.snsr $BASE/sdk-folder/third-party/alexa-rpi/models/spot-alexa-rpi-21000.snsr $BASE/sdk-folder/third-party/alexa-rpi/models/spot-alexa-rpi-31000.snsr; \
     fi
-
-# needed since Kitt-AI version 1.3.0	
-RUN cp $BASE/sdk-folder/third-party/snowboy/resources/alexa/alexa-avs-sample-app/alexa.umdl $BASE/sdk-folder/third-party/snowboy/resources/alexa.umdl
 
 WORKDIR $BASE/sdk-folder/sdk-build
 
@@ -114,10 +29,14 @@ RUN if [ "$BuildEnv" = "rpi" ]; then \
     else \
 	  myos=ubuntu64; \
     fi; \
-    cmake $BASE/sdk-folder/sdk-source/avs-device-sdk \
-    -DKITTAI_KEY_WORD_DETECTOR=ON \
-    -DKITTAI_KEY_WORD_DETECTOR_LIB_PATH=$BASE/sdk-folder/third-party/snowboy/lib/$myos/libsnowboy-detect.a \
-    -DKITTAI_KEY_WORD_DETECTOR_INCLUDE_DIR=$BASE/sdk-folder/third-party/snowboy/include \
+	if [ "$WakeWordEngine" = "kittai" ]; then \
+	  buildparams="-DKITTAI_KEY_WORD_DETECTOR=ON -DKITTAI_KEY_WORD_DETECTOR_LIB_PATH=$BASE/sdk-folder/third-party/snowboy/lib/$myos/libsnowboy-detect.a -DKITTAI_KEY_WORD_DETECTOR_INCLUDE_DIR=$BASE/sdk-folder/third-party/snowboy/include"; \
+	elif [ "$WakeWordEngine" = "sensory" ]; then \
+	  buildparams="-DSENSORY_KEY_WORD_DETECTOR=ON -DSENSORY_KEY_WORD_DETECTOR_LIB_PATH=$BASE/sdk-folder/third-party/alexa-rpi/lib/libsnsr.a	-DSENSORY_KEY_WORD_DETECTOR_INCLUDE_DIR=$BASE/sdk-folder/third-party/alexa-rpi/include"; \
+    else \
+	  buildparams=""; \
+    fi; \
+    cmake $BASE/sdk-folder/sdk-source/avs-device-sdk $buildparams \
     -DGSTREAMER_MEDIA_PLAYER=ON \
     -DPORTAUDIO=ON \
     -DPORTAUDIO_LIB_PATH=$BASE/sdk-folder/third-party/portaudio/lib/.libs/libportaudio.a \
