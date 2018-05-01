@@ -23,14 +23,24 @@ sed -i "s:\${SDK_NOTIFICATIONS_DATABASE_FILE_PATH}:$SDK_NOTIFICATIONS_DATABASE_F
 
 cd ./sdk-build
 
-if [ "$KITT_AI_SENSITIVITY" != "0.6" ] || [ "$KITT_AI_APPLY_FRONT_END_PROCESSING" != "true" ]; then
-  # file nur patchen wenn notwendig
-  sed -i "s:KITT_AI_SENSITIVITY = 0.6:KITT_AI_SENSITIVITY = $KITT_AI_SENSITIVITY:" /srv/sdk-folder/sdk-source/avs-device-sdk/KWD/KWDProvider/src/KeywordDetectorProvider.cpp
-  sed -i "s:KITT_AI_APPLY_FRONT_END_PROCESSING = true:KITT_AI_APPLY_FRONT_END_PROCESSING = $KITT_AI_APPLY_FRONT_END_PROCESSING:" /srv/sdk-folder/sdk-source/avs-device-sdk/KWD/KWDProvider/src/KeywordDetectorProvider.cpp
-  make SampleApp -j2
-fi  
+if [ "$WakeWordEngine" = "kittai" ]; then 
+  if [ "$KITT_AI_SENSITIVITY" != "0.6" ] || [ "$KITT_AI_APPLY_FRONT_END_PROCESSING" != "true" ]; then
+    # file nur patchen wenn notwendig
+    sed -i "s:KITT_AI_SENSITIVITY = 0.6:KITT_AI_SENSITIVITY = $KITT_AI_SENSITIVITY:" /srv/sdk-folder/sdk-source/avs-device-sdk/KWD/KWDProvider/src/KeywordDetectorProvider.cpp
+    sed -i "s:KITT_AI_APPLY_FRONT_END_PROCESSING = true:KITT_AI_APPLY_FRONT_END_PROCESSING = $KITT_AI_APPLY_FRONT_END_PROCESSING:" /srv/sdk-folder/sdk-source/avs-device-sdk/KWD/KWDProvider/src/KeywordDetectorProvider.cpp
+    make SampleApp -j2
+  fi
+fi
+
+if [ "$WakeWordEngine" = "kittai" ]; then
+  export modeldir="/srv/sdk-folder/third-party/snowboy/resources"
+elif [ "$WakeWordEngine" = "sensory" ]; then
+  export modeldir="/srv/sdk-folder/third-party/alexa-rpi/models"
+else
+  export modeldir=""
+fi
 
 cd ./SampleApp/src \
   && ./SampleApp \
   /srv/sdk-folder/AlexaClientSDKConfig.json \
-  /srv/sdk-folder/third-party/snowboy/resources $1
+  $modeldir $1
