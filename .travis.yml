@@ -5,18 +5,26 @@ language: bash
 git:
   depth: 1
 env:
-  global:
-    - LANG=de_DE.UTF-8
-script:
+- WakeWordEngine=kittai
+- WakeWordEngine=sensory
+before_script:    
 - pwd
 - docker-compose version
 - echo "TRAVIS_BRANCH="$TRAVIS_BRANCH
 # prepare qemu
 - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+- export tmpWakeWordEngine=$WakeWordEngine
 # get variables from .env
 - cat .env
 - export $(cat .env | grep -v ^# | xargs)
+- export WakeWordEngine=$tmpWakeWordEngine
 - env
+script:
+- >
+  if [ "$BuildEnv" == "ubuntu64" ] && [ "$WakeWordEngine" == "sensory" ]; then
+    # exit
+    travis_terminate 0;
+  fi
 # build base image
 - cd $TRAVIS_BUILD_DIR/build_base
 - docker-compose build
@@ -27,16 +35,4 @@ script:
 - docker images
 - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
 - docker push "$DOCKER_USER"/alexa_sdk:"${BuildEnv}"_"${WakeWordEngine}"_"${SDK_Version}"
-- >
-  if [ "$BuildEnv" == "ubuntu64" ] ; then
-    # exit
-    travis_terminate 0;
-  fi
-- export WakeWordEngine=sensory
-# build image
-- cd $TRAVIS_BUILD_DIR/build
-- docker-compose build
-# push image
-- docker images
-- docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
-- docker push "$DOCKER_USER"/alexa_sdk:"${BuildEnv}"_"${WakeWordEngine}"_"${SDK_Version}"
+  
