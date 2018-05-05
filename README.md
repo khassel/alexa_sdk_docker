@@ -8,13 +8,9 @@
 The setup for graphical desktop is not needed.
 
 ### Setup
--	```bash
-	git clone --depth 1 -b rpi_v1.7 https://github.com/khassel/alexa_sdk_docker.git ~/alexa
-	```
-	
--	```bash
-	docker pull karsten13/alexa_sdk:rpi_v1.7
-	```
+```
+git clone --depth 1 -b rpi_v1.7 https://github.com/khassel/alexa_sdk_docker.git ~/alexa
+```
 	
 ## Setup for linux
 ### Requirements
@@ -23,15 +19,20 @@ The setup for graphical desktop is not needed.
 
 
 ### Setup
--	```bash
-	git clone --depth 1 -b ubuntu64_v1.7 https://github.com/khassel/alexa_sdk_docker.git ~/alexa
-	```
-	
--	```bash
-	docker pull karsten13/alexa_sdk:ubuntu64_v1.7
-	```
+```
+git clone --depth 1 -b ubuntu64_v1.7 https://github.com/khassel/alexa_sdk_docker.git ~/alexa
+```
 
 ## Next setup steps for both raspberry-pi and linux
+### Pull the docker image (also needed for updating the image)
+- goto ```cd ~/alexa/run``` and execute ```docker-compose pull```
+### Select the WakeWordEngine
+Two WakeWordEngines are supported:
+- Kitt-AI: Works for linux and raspberry-pi, you can change the WakeWord "Alexa".
+- Sensory: Works for raspberry-pi only, you can't change the WakeWord "Alexa".
+
+Kitt-AI is the default-WakeWordEngine. If you want to use Sensory, goto ```cd ~/alexa``` and edit the file .env, set ```WakeWordEngine=sensory```.
+
 ### Preparing for the first start of the container
 
 -	Before the first start of the container you need to put valid parameters in the `docker-compose.yml` file in the folder ~/alexa/run. In the environment section of `docker-compose.yml` fill in the following (missing) values:
@@ -41,7 +42,7 @@ The setup for graphical desktop is not needed.
       - SDK_CONFIG_CLIENT_ID=
       - SDK_CONFIG_PRODUCT_ID=
 	```
-	These values are used in the `AlexaClientSDKConfig.json` file. You find more infos about this [here](https://github.com/alexa/avs-device-sdk/wiki/Create-Security-Profile).
+	These values are used in the `AlexaClientSDKConfig.json` file internally. You find more infos about this [here](https://github.com/alexa/avs-device-sdk/wiki/Create-Security-Profile).
 -   Now goto ```cd ~/alexa/run``` and execute ```docker-compose up -d```. The container will start, wait a moment and execute ```docker logs al``` to see the logs.
     Search for a similar section in the logs:
 	```
