@@ -13,6 +13,8 @@ ENV SDK_CBL_AUTH_DELEGATE_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessi
     SDK_CERTIFIED_SENDER_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/certifiedSender.db \
     SDK_NOTIFICATIONS_DATABASE_FILE_PATH=/srv/sdk-folder/application-necessities/notifications.db
 
+ENV DEBIAN_FRONTEND=noninteractive
+	
 RUN apt-get update && apt-get upgrade -y
 
 # need old gcc-version 4.8 due to this error:
@@ -29,7 +31,7 @@ RUN apt-get -y install gcc-4.8 g++-4.8; \
     else \
 	  apt-get -y install openssl clang-format pulseaudio repo binutils autoconf automake autotools-dev libtool pkg-config \
 		zlib1g-dev libcunit1-dev libssl-dev libxml2-dev libev-dev libevent-dev libjansson-dev libjemalloc-dev cython \
-		python3-dev python-setuptools libgstreamer-plugins-good1.0-dev; \
+		python3-dev python-setuptools libgstreamer-plugins-good1.0-dev python-pip; \
     fi; \
 	apt-get clean; \
     rm -rf /var/lib/apt/lists/*
@@ -64,7 +66,6 @@ RUN if [ "$BuildEnv" = "rpi" ]; then \
 	  && rm -rf ../curl-7.54.0.tar.bz2 \
       && ldconfig \
       && curl -I https://nghttp2.org/; \
-      easy_install pip; \
       pip install --user flask requests commentjson; \
     fi; \
     python --version; \ 
